@@ -13,8 +13,11 @@ import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import android.Manifest
+import android.app.Activity
 import android.content.ContentValues.TAG
+import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,6 +50,8 @@ class ChatActivity : AppCompatActivity() {
     }
     private lateinit var database: DatabaseReference
     private lateinit var chatAdapter: ChatAdapter
+    private val REQUEST_IMAGE_CAPTURE = 101
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,8 +124,7 @@ class ChatActivity : AppCompatActivity() {
 
         val cameraBtn: ImageView = findViewById(R.id.cameraBtn)
         cameraBtn.setOnClickListener {
-            val intent = Intent(this, PhotoScreenActivity::class.java)
-            startActivity(intent)
+            dispatchTakePictureIntent()
         }
 
         val callBtn: ImageView = findViewById(R.id.callBtn)
@@ -156,6 +160,13 @@ class ChatActivity : AppCompatActivity() {
 
 
     }
+    private fun dispatchTakePictureIntent() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (takePictureIntent.resolveActivity(packageManager) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
+
 
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK)
@@ -177,6 +188,10 @@ class ChatActivity : AppCompatActivity() {
         } else if (requestCode == PICK_VIDEO_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
             val videoUri: Uri = data.data!!
             uploadVideoToFirebase(videoUri)
+        }
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            val imageBitmap = data?.extras?.get("data") as Bitmap
+            uploadImageToFirebase(imageBitmap)
         }
     }
 
@@ -228,6 +243,48 @@ class ChatActivity : AppCompatActivity() {
 
         // Upload the image to Firebase Storage
         val uploadTask = storageRef.putFile(imageUri)
+        uploadTask.addOnSuccessListener { taskSnapshot ->
+            // Get the download URL of the uploaded image
+            storageRef.downloadUrl.addOnSuccessListener { uri ->
+                // Create a ChatMessage object with image URL and other metadata
+                val chatMessage = ChatMessage("", senderName, timestamp, MessageType.IMAGE, uri.toString())
+
+                // Store the ChatMessage object in the Realtime Database
+                imageRef.setValue(chatMessage)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e(TAG, "Error uploading image: $exception")
+                        Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show()
+                    }
+            }.addOnFailureListener { exception ->
+                Log.e(TAG, "Error getting download URL: $exception")
+                Toast.makeText(this, "Failed to get download URL", Toast.LENGTH_SHORT).show()
+            }
+        }.addOnFailureListener { exception ->
+            Log.e(TAG, "Error uploading image: $exception")
+            Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun uploadImageToFirebase(bitmap: Bitmap) {
+        val imageName = database.push().key ?: ""
+        val imageRef = database.child(imageName)
+
+        val senderName = "John Cooper"
+        val timestamp = getCurrentTimeString()
+
+        // Convert bitmap to byte array
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val imageData = baos.toByteArray()
+
+        // Get a reference to the Firebase storage location where you want to upload the image
+        val storageRef = FirebaseStorage.getInstance().reference.child("images").child(imageName)
+
+        // Upload the image to Firebase Storage
+        val uploadTask = storageRef.putBytes(imageData)
         uploadTask.addOnSuccessListener { taskSnapshot ->
             // Get the download URL of the uploaded image
             storageRef.downloadUrl.addOnSuccessListener { uri ->

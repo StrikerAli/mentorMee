@@ -1,0 +1,16 @@
+<resources>
+
+    <style name="Widget.Theme.I210813.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="Widget.Theme.I210813.ButtonBar.Fullscreen" parent="">
+        <item name="android:background">@color/black_overlay</item>
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    </style>
+
+    <style name="AppTheme.Calendar" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
+</resources>

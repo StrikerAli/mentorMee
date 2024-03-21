@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "719617637434",
+    "firebase_url": "https://androidtest-2f091-default-rtdb.firebaseio.com",
+    "project_id": "androidtest-2f091",
+    "storage_bucket": "androidtest-2f091.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719617637434:android:fb1a9fab42c1329bb80903",
+        "android_client_info": {
+          "package_name": "com.aliashraf.assignment2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVAiPMQf3VNgetiWK6qizKontRm6bM3G8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719617637434:android:dd00938b029f75a6b80903",
+        "android_client_info": {
+          "package_name": "com.aliashraf.test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVAiPMQf3VNgetiWK6qizKontRm6bM3G8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

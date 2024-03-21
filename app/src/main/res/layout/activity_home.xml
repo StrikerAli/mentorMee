@@ -254,7 +254,9 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:importantForAccessibility="no"
-                                android:src="@android:color/transparent" />
+                                android:src="@android:color/transparent"
+                                tools:layout_editor_absoluteX="0dp"
+                                tools:layout_editor_absoluteY="0dp" />
 
                             <androidx.cardview.widget.CardView
                                 android:layout_width="match_parent"
